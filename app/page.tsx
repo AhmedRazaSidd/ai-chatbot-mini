@@ -91,18 +91,27 @@ export default function Chat() {
             className="fixed bottom-20 right-4 z-50 w-[95%] md:w-[500px]"
           >
             <Card className="border-2">
-              <CardHeader className="flex items-center justify-between">
-                <CardTitle className="text-lg font-medium">
-                  Chat with AI
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-lg font-bold">
+                  Chat with NothWorthy AI
                 </CardTitle>
                 <Button
                   onClick={toggleChat}
-                  size="icon"
-                  className="rounded-full size-14 p-2 shadow-lg"
+                  size="sm"
+                  variant="ghost"
+                  className="px-2 py-0"
                 >
-                  <X className="size-12" />
+                  <X className="size-4" />
+                  <span className="sr-only">Close Chat</span>
                 </Button>
               </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[300px] pr-4">
+                  <div className="w-full h-full self-stretch text-gray-500 flex items-center justify-center  gap-3">
+                    No Message yet!
+                  </div>
+                </ScrollArea>
+              </CardContent>
             </Card>
           </motion.div>
         )}
