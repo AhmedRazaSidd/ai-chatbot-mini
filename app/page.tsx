@@ -43,6 +43,7 @@ export default function Chat() {
     reload,
     error,
   } = useChat({ api: "/api/gemini" });
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,6 +66,12 @@ export default function Chat() {
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
   };
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -116,7 +123,7 @@ export default function Chat() {
                   <span className="sr-only">Close Chat</span>
                 </Button>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-y-scroll">
                 <ScrollArea className="h-[300px] pr-4">
                   {messages?.length === 0 && (
                     <div className="w-full mt-32 text-gray-500 flex items-center justify-center  gap-3">
@@ -126,12 +133,12 @@ export default function Chat() {
                   {messages?.map((message, index) => (
                     <div
                       key={index}
-                      className={`mb-4 ${
+                      className={`pb-4 ${
                         message.role === "user" ? "text-right" : "text-left"
                       }`}
                     >
                       <div
-                        className={`inline-block rounded-lg ${
+                        className={`inline-block p-4 rounded-lg ${
                           message.role === "user"
                             ? "bg-primary text-primary-foreground"
                             : "bg-muted"
@@ -199,6 +206,7 @@ export default function Chat() {
                       </button>
                     </div>
                   )}
+                  <div ref={scrollRef}></div>
                 </ScrollArea>
               </CardContent>
               <CardFooter>
@@ -208,6 +216,7 @@ export default function Chat() {
                 >
                   <Input
                     type="text"
+                    value={input}
                     onChange={handleInputChange}
                     className="flex-1"
                     placeholder="Type your message here..."

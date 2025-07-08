@@ -31,32 +31,17 @@ const buildGoogleGenAIPrompt = (messages: Message[]): Message[] => [
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    console.log("[DEBUG] Request body:", body);
-
-    const { messages } = body;
-    if (!Array.isArray(messages)) {
-      throw new Error("Invalid 'messages' format. Expected an array.");
-    }
-
+    const { messages } = await request.json();
     const prompt = buildGoogleGenAIPrompt(messages);
-    console.log("[DEBUG] Built prompt:", prompt);
 
     const stream = await streamText({
-      model: google("gemini-1.5-pro"), // ✅ FIXED: Correct model name
+      model: google("gemini-1.5-flash"),
       messages: prompt,
       temperature: 0.7,
     });
 
-    return stream.toAIStreamResponse(); // ✅ correct stream response handler
-  } catch (error: any) {
-    console.error("[ERROR]", error);
-    return new Response(
-      JSON.stringify({ error: "Internal Server Error", details: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return stream?.toDataStreamResponse();
+  } catch (error) {
+    console.log(error);
   }
 }
