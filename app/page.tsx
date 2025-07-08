@@ -33,6 +33,17 @@ export default function Chat() {
   const [showChatIcon, setShowChatIcon] = useState(false);
   const chatIconRef = useRef<HTMLButtonElement>(null);
 
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+    stop,
+    reload,
+    error,
+  } = useChat({ api: "/api/gemini" });
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 200) {
@@ -107,11 +118,110 @@ export default function Chat() {
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[300px] pr-4">
-                  <div className="w-full h-full self-stretch text-gray-500 flex items-center justify-center  gap-3">
-                    No Message yet!
-                  </div>
+                  {messages?.length === 0 && (
+                    <div className="w-full mt-32 text-gray-500 flex items-center justify-center  gap-3">
+                      No Message yet!
+                    </div>
+                  )}
+                  {messages?.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`mb-4 ${
+                        message.role === "user" ? "text-right" : "text-left"
+                      }`}
+                    >
+                      <div
+                        className={`inline-block rounded-lg ${
+                          message.role === "user"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted"
+                        }`}
+                      >
+                        <ReactMarkdown
+                          children={message.content}
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            code({
+                              node,
+                              inline,
+                              className,
+                              children,
+                              ...props
+                            }) {
+                              return inline ? (
+                                <code
+                                  {...props}
+                                  className="bg-gray-200 px-1 rounded"
+                                >
+                                  {children}
+                                </code>
+                              ) : (
+                                <pre
+                                  {...props}
+                                  className="bg-gray-200 p-1 rounded"
+                                >
+                                  <code>{children}</code>
+                                </pre>
+                              );
+                            },
+                            ul: ({ children }) => (
+                              <ul className="list-disc ml-4">{children}</ul>
+                            ),
+                            ol: ({ children }) => (
+                              <li className="list-decimal ml-4">{children}</li>
+                            ),
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  {isLoading && (
+                    <div className="w-full items-center flex justify-center gap-3">
+                      <Loader2 className="animate-spin h-5 w-5 text-primary" />
+                      <button
+                        className="underline"
+                        type="button"
+                        onClick={() => stop()}
+                      >
+                        abort
+                      </button>
+                    </div>
+                  )}
+                  {error && (
+                    <div className="w-full items-center flex justify-center gap-3">
+                      <div>An error occurred.</div>
+                      <button
+                        className="underline"
+                        type="button"
+                        onClick={() => reload()}
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  )}
                 </ScrollArea>
               </CardContent>
+              <CardFooter>
+                <form
+                  onSubmit={handleSubmit}
+                  className="flex w-full items-center space-x-2"
+                >
+                  <Input
+                    type="text"
+                    onChange={handleInputChange}
+                    className="flex-1"
+                    placeholder="Type your message here..."
+                  />
+                  <Button
+                    type="submit"
+                    className="size-9"
+                    disabled={isLoading}
+                    size="icon"
+                  >
+                    <Send className="size-14" />
+                  </Button>
+                </form>
+              </CardFooter>
             </Card>
           </motion.div>
         )}
