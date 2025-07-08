@@ -150,20 +150,25 @@ export default function Chat() {
                           components={{
                             code({
                               node,
+                              // @ts-ignore
                               inline,
                               className,
                               children,
+                              // @ts-ignore
                               ...props
                             }) {
                               return inline ? (
                                 <code
+                                  // @ts-ignore
                                   {...props}
                                   className="bg-gray-200 px-1 rounded"
                                 >
                                   {children}
                                 </code>
                               ) : (
+                                // @ts-ignore
                                 <pre
+                                  // @ts-ignore
                                   {...props}
                                   className="bg-gray-200 p-1 rounded"
                                 >
